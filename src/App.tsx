@@ -3,9 +3,10 @@ import './App.css'
 import { AppBarMenu } from './componets/layout/AppBarMenu'
 import { useState } from 'react'
 import { SideNav } from './componets/layout/SideNav';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { LoginForm } from './componets/auth/LoginForm';
 import Swal from 'sweetalert2';
+import { CareersList } from './componets/careers/CareersList.tsx';
 
 function App() {
 
@@ -22,7 +23,7 @@ function App() {
       cancelButtonColor: "#d33",
       confirmButtonText: "Si!"
     }).then((result) => {
-      if(result.isConfirmed) {
+      if (result.isConfirmed) {
         window.location.href = '/login';
       }
     });
@@ -34,8 +35,10 @@ function App() {
       <AppBarMenu onMenuClick={handleDrawerToggle} onLogout={handleLogout}></AppBarMenu>
       <SideNav open={drawerOpen} onClose={handleDrawerToggle}></SideNav>
       <Routes>
-        <Route path='/login' element={<LoginForm onLoginSuccess={() => window.location.href = 'www.google.com.gt'} />} />
-      </Routes>
+        <Route path='/login' element={<LoginForm onLoginSuccess={() => window.location.href = '/careers'} />} />
+          <Route path='/careers' element={<CareersList/>} />
+          <Route path='/' element={<Navigate to="/careers"/>}/>
+        </Routes>
     </Router>
   )
 }
