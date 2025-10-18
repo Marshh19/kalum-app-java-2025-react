@@ -133,6 +133,13 @@ export const CareersList: React.FC = () => {
         });
     }
 
+    const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
+
+    const handleChangeRowsPage = (e: React.ChanEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(e.target.value,10));
+        setPage(0);
+    }
+
     return (
         <Container sx={{ mt: 10 }}>
             <Typography variant='h4' gutterBottom>Carreras Tecnicas</Typography>
@@ -174,7 +181,7 @@ export const CareersList: React.FC = () => {
                         )}
                     </TableBody>
                 </Table>
-                <TablePagination component="div" count={careers.length} page={page} onPageChange={() => { }} rowsPerPage={rowsPerPage} rowsPerPageOptions={[5, 10, 20]} />
+                <TablePagination component="div" count={careers.length} page={page} onPageChange={handleChangePage} rowsPerPage={rowsPerPage} onRowsPerPageChange={handleChangeRowsPage} rowsPerPageOptions={[5, 10, 20]} />
             </TableContainer>
             <Dialog open={modalOpen} fullWidth maxWidth="sm" onClose={handleCloseModal}>
                 <DialogTitle>{selectedCareer ? 'Editar Carrera' : "Agregar Carrera"}</DialogTitle>
