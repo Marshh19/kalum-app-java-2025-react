@@ -135,7 +135,7 @@ export const CareersList: React.FC = () => {
 
     const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
 
-    const handleChangeRowsPage = (e: React.ChanEvent<HTMLInputElement>) => {
+    const handleChangeRowsPage = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(e.target.value,10));
         setPage(0);
     }
