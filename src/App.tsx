@@ -1,14 +1,15 @@
 import { CssBaseline } from '@mui/material'
 import './App.css'
-import { AppBarMenu } from './componets/layout/AppBarMenu'
+import { AppBarMenu } from './components/layout/AppBarMenu.tsx'
 import { useState } from 'react'
-import { SideNav } from './componets/layout/SideNav';
+import { SideNav } from './components/layout/SideNav.tsx';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { LoginForm } from './componets/auth/LoginForm';
+import { LoginForm } from './components/auth/LoginForm.tsx';
 import Swal from 'sweetalert2';
-import { CareersList } from './componets/careers/CareersList.tsx';
+import { CareersList } from './components/careers/CareersList.tsx';
 import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './routes/ProtectedRoute.tsx';
+import { UserList } from './components/users/UserList.tsx';
 
 function App() {
   const { isAuthenticated, logout } = useAuth();
@@ -47,6 +48,11 @@ function App() {
         <Route path='/careers' element={
           <ProtectedRoute>
             <CareersList />
+          </ProtectedRoute>
+        } />
+        <Route path='/users' element={
+          <ProtectedRoute>
+            <UserList />
           </ProtectedRoute>
         } />
         <Route path='/' element={<Navigate to="/careers" />} />

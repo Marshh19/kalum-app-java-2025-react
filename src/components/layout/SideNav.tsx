@@ -1,8 +1,11 @@
 import React from 'react'
-import Schoolicon from '@mui/icons-material/School'
-import PeopleIcon from '@mui/icons-material/People';
-import { Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 
+import SchoolIcon from '@mui/icons-material/School'
+import PeopleIcon from '@mui/icons-material/People';
+import SecurityIcon from '@mui/icons-material/Security';
+
+import { Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 interface SideNavProps {
     open: boolean;
@@ -15,32 +18,41 @@ interface MenuItem {
     path: string;
 }
 
+
 export const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
+
+    const navigate = useNavigate();
 
     const drawerWidth = 260;
 
     const menuItem: MenuItem[] = [
         {
-            text: 'Carreras Tecnicas',
-            icon: <Schoolicon />,
+            text: 'Carreras Técnicas',
+            icon: <SchoolIcon/>,
             path: '/carreras'
         },
         {
             text: 'Usuarios',
-            icon: <PeopleIcon />,
+            icon: <PeopleIcon/>,
+            path: '/users'
+        },
+        {
+            text: 'Roles',
+            icon: <SecurityIcon/>,
             path: '/usuarios'
         }
     ]
 
     const handleItemClick = (path: string) => {
+        navigate(path);
         onClose();
     }
 
     return (
-        <Drawer anchor='left' open={open} onClose={onClose} ModalProps={{ keepMounted: true }} sx={{'& .MuiDrawer-paper': {top: '64px', height: 'calc(100% - 64px)' }}}>
+        <Drawer anchor='left' open={open} onClose={onClose} ModalProps={{ keepMounted: true }} sx={{'& .MuiDrawer-paper': {top: '64px', height: 'calc(100% - 64px)'}}}>
             <List sx={{ width: drawerWidth }}>
                 {
-                    menuItem.map((item, index) => (
+                    menuItem.map((item,index) => (
                         <ListItemButton key={index} onClick={() => handleItemClick(item.path)}>
                             <ListItemIcon>{item.icon}</ListItemIcon>
                             <ListItemText primary={item.text}></ListItemText>
@@ -49,5 +61,5 @@ export const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
                 }
             </List>
         </Drawer>
-    )
+  )
 }
