@@ -16,7 +16,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         login(email, password).then((response: any) => {
-            if (response.data.token) {
+            if (response?.data?.token) {
                 Swal.fire({
                     title: 'Login',
                     text: 'Bienvenido al sistema',
