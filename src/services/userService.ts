@@ -42,6 +42,7 @@ export interface UserCreateResponse {
 export const userService = {
     findAll: async (): Promise<UserListResponse> => {
         const response = await api.get<UserListResponse>(`users`);
+        console.log(response);
         return response.data;
     }, 
     save: async(user: UserCreateDTO): Promise<UserCreateResponse> => {

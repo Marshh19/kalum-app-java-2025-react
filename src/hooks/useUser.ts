@@ -1,0 +1,18 @@
+import type {AppDispatch, RootState } from "../store/store";
+import { useDispatch, useSelector } from "react-redux"
+import {userService} from '../services/userService';
+
+
+export const useUser = () => {
+    const {users} = useSelector((state: RootState) => state.users);
+    const dispatch = useDispatch<AppDispatch>();
+
+    const getUsers = async () => {
+        const response = await userService.findAll(); 
+        console.log(response);
+    }
+    
+    return {
+        getUsers
+    }
+}   
