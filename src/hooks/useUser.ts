@@ -9,7 +9,7 @@ export const useUser = () => {
 
     const getUsers = async () => {
         const response = await userService.findAll(); 
-        console.log(response);
+        return response;
     }
     
     return {
