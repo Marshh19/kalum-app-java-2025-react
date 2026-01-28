@@ -10,6 +10,7 @@ import { CareersList } from './components/careers/CareersList.tsx';
 import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './routes/ProtectedRoute.tsx';
 import { UserList } from './components/users/UserList.tsx';
+import { DashBoard } from './components/dashboard/DashBoard.tsx';
 
 function App() {
   const { isAuthenticated, logout } = useAuth();
@@ -44,7 +45,10 @@ function App() {
       )}
 
       <Routes>
-        <Route path='/login' element={<LoginForm onLoginSuccess={() => window.location.href = '/careers'} />} />
+        <Route path='/login' element={<LoginForm onLoginSuccess={() => window.location.href = '/dashboard'} />} />
+        <Route path='/dashboard' element={
+            <DashBoard/>
+        } />
         <Route path='/careers' element={
           <ProtectedRoute>
             <CareersList />
@@ -55,7 +59,7 @@ function App() {
             <UserList />
           </ProtectedRoute>
         } />
-        <Route path='/' element={<Navigate to="/careers" />} />
+        <Route path='/' element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>
   )
