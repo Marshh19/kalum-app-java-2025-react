@@ -45,7 +45,7 @@ interface User {
 
 
 export const UserList: React.FC = () => {
-    const { users, getUsers, createUser, deleteUser, updateUserThunk } = useUser();
+    const { users, getUsersThunk, createUserThunk, deleteUserThunk, updateUserThunk } = useUser();
     //const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(0);
@@ -64,7 +64,7 @@ export const UserList: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            await getUsers();
+            await getUsersThunk();
             setLoading(false);
         }
         fetchData();
@@ -101,7 +101,7 @@ export const UserList: React.FC = () => {
             confirmButtonText: "Si, eliminar!"
         }).then((result) => {
             if (result.isConfirmed) {
-                deleteUser(id).then(response => {
+                deleteUserThunk(id).then(response => {
                     if (response.status == 204) {
                         Swal.fire({
                             title: "Eliminado",
@@ -147,7 +147,7 @@ export const UserList: React.FC = () => {
         if (selectedUser) {
             response = await updateUserThunk(selectedUser.id, data);
         } else {
-            response = await createUser(data);
+            response = await createUserThunk(data);
         }
         if (response.success || response.status === 204) {
             handleCloseModal();
