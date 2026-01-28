@@ -45,7 +45,7 @@ interface User {
 
 
 export const UserList: React.FC = () => {
-    const { users, getUsers, createUser, deleteUser } = useUser();
+    const { users, getUsers, createUser, deleteUser, updateUserThunk } = useUser();
     //const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(0);
@@ -121,126 +121,138 @@ export const UserList: React.FC = () => {
         });
     }
 
-const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
+    const handleChangePage = (_: unknown, newPage: number) => setPage(newPage);
 
-const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setPage(0);
-}
-
-const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedUser(null);
-    setFormUsername('');
-}
-
-const handleSave = async () => {
-    const data = {
-        'username': formUsername,
-        'firstname': formFirstName,
-        'lastname': formLastName,
-        'email': formEmail,
-        'phoneNumber': formPhoneNumber,
-        'password': formPassword
-    };
-    const response = await createUser(data);
-    if (response.success) {
-        handleCloseModal();
-        Swal.fire({
-            title: 'Usuarios',
-            text: response.message ? response.message : 'El registro fue almacenado correctamente.',
-            icon: 'success'
-        });
+    const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(parseInt(e.target.value, 10));
+        setPage(0);
     }
-}
 
-const paginatedUsers = users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        setSelectedUser(null);
+        setFormUsername('');
+    }
 
-if (loading) {
+    const handleSave = async () => {
+        let response: any;
+        const data = {
+            'username': formUsername,
+            'firstname': formFirstName,
+            'lastname': formLastName,
+            'email': formEmail,
+            'phoneNumber': formPhoneNumber,
+            'password': formPassword
+        };
+        if (selectedUser) {
+            response = await updateUserThunk(selectedUser.id, data);
+        } else {
+            response = await createUser(data);
+        }
+        if (response.success || response.status === 204) {
+            handleCloseModal();
+            Swal.fire({
+                title: 'Usuarios',
+                text: response.message ? response.message : 'El registro fue almacenado correctamente.',
+                icon: 'success'
+            });
+        } else {
+            handleCloseModal();
+            Swal.fire({
+                title: 'Usuarios',
+                text: response.message ? response.message : 'El registro fue almacenado correctamente.',
+                icon: 'error'
+            });
+        }
+    }
+
+    const paginatedUsers = users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
+    if (loading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
-            <CircularProgress />
-        </Box>
-    );
-}
-
-return (
-    <Container sx={{ mt: 10 }}>
-        <Typography variant='h4' gutterBottom>Usuarios</Typography>
-        <Button variant='contained' startIcon={<AddIcon />} sx={{ mb: 2 }} onClick={() => handleOpenModal()}>
-            Agregar Usuario
-        </Button>
-        <TableContainer component={Paper}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>ID</TableCell>
-                        <TableCell>USERNAME</TableCell>
-                        <TableCell>FULL NAME</TableCell>
-                        <TableCell>EMAIL</TableCell>
-                        <TableCell>IDENTITY</TableCell>
-                        <TableCell>PHONE</TableCell>
-                        <TableCell align='right'>ACCIONES</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {paginatedUsers.map(((user: any) => (
-                        <TableRow key={user.id}>
-                            <TableCell>{user.id}</TableCell>
-                            <TableCell>{user.username}</TableCell>
-                            <TableCell>{user.fullName}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.identityUser}</TableCell>
-                            <TableCell>{user.phoneNumber}</TableCell>
-                            <TableCell align="right">
-                                <IconButton onClick={() => { handleOpenModal(user) }} color='primary'>
-                                    <Edition />
-                                </IconButton>
-                            </TableCell>
-                            <TableCell align='right'>
-                                <IconButton color='error' onClick={() => { handleDelete(user.id) }}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    )))}
-                    {paginatedUsers.length === 0 && (
+        <Container sx={{ mt: 10 }}>
+            <Typography variant='h4' gutterBottom>Usuarios</Typography>
+            <Button variant='contained' startIcon={<AddIcon />} sx={{ mb: 2 }} onClick={() => handleOpenModal()}>
+                Agregar Usuario
+            </Button>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
                         <TableRow>
-                            <TableCell colSpan={3} align='center'>
-                                No hay Usuarios disponibles
-                            </TableCell>
+                            <TableCell>ID</TableCell>
+                            <TableCell>USERNAME</TableCell>
+                            <TableCell>FULL NAME</TableCell>
+                            <TableCell>EMAIL</TableCell>
+                            <TableCell>IDENTITY</TableCell>
+                            <TableCell>PHONE</TableCell>
+                            <TableCell align='right'>ACCIONES</TableCell>
                         </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-            <TablePagination component="div" count={users.length} page={page} onPageChange={handleChangePage} rowsPerPage={rowsPerPage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPageOptions={[5, 10, 20]} />
-        </TableContainer>
-        <Dialog open={modalOpen} fullWidth maxWidth="sm" onClose={handleCloseModal} disableEnforceFocus>
-            <DialogTitle>{selectedUser ? 'Editar Usuario' : 'Agregar Usuario'}</DialogTitle>
-            <DialogContent>
-                <TextField label="Username" fullWidth margin='normal' value={formUsername} onChange={(e) => setFormUsername(e.target.value)} />
-                <TextField label="First Name" fullWidth margin='normal' value={formFirstName} onChange={(e) => setFormFirstName(e.target.value)} />
-                <TextField label="Last Name" fullWidth margin='normal' value={formLastName} onChange={(e) => setFormLastName(e.target.value)} />
-                <TextField label="Email" type='email' fullWidth margin='normal' value={formEmail} onChange={(e) => setFormEmail(e.target.value)} />
-                <TextField label="Phone Number" fullWidth margin='normal' value={formPhoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-                <TextField label="Password" type={showPassword ? 'text' : 'password'} fullWidth margin='normal' value={formPassword} onChange={(e) => setFormPassword(e.target.value)}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position='end'>
-                                <IconButton onClick={() => setShowPassword(!showPassword)} edge='end' aria-label='toggle password visibility'>
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        )
+                    </TableHead>
+                    <TableBody>
+                        {paginatedUsers.map(((user: any) => (
+                            <TableRow key={user.id}>
+                                <TableCell>{user.id}</TableCell>
+                                <TableCell>{user.username}</TableCell>
+                                <TableCell>{user.fullName}</TableCell>
+                                <TableCell>{user.email}</TableCell>
+                                <TableCell>{user.identityUser}</TableCell>
+                                <TableCell>{user.phoneNumber}</TableCell>
+                                <TableCell align="right">
+                                    <IconButton onClick={() => { handleOpenModal(user) }} color='primary'>
+                                        <Edition />
+                                    </IconButton>
+                                </TableCell>
+                                <TableCell align='right'>
+                                    <IconButton color='error' onClick={() => { handleDelete(user.id) }}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        )))}
+                        {paginatedUsers.length === 0 && (
+                            <TableRow>
+                                <TableCell colSpan={3} align='center'>
+                                    No hay Usuarios disponibles
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+                <TablePagination component="div" count={users.length} page={page} onPageChange={handleChangePage} rowsPerPage={rowsPerPage} onRowsPerPageChange={handleChangeRowsPerPage} rowsPerPageOptions={[5, 10, 20]} />
+            </TableContainer>
+            <Dialog open={modalOpen} fullWidth maxWidth="sm" onClose={handleCloseModal} disableEnforceFocus>
+                <DialogTitle>{selectedUser ? 'Editar Usuario' : 'Agregar Usuario'}</DialogTitle>
+                <DialogContent>
+                    <TextField label="Username" fullWidth margin='normal' value={formUsername} onChange={(e) => setFormUsername(e.target.value)} />
+                    <TextField label="First Name" fullWidth margin='normal' value={formFirstName} onChange={(e) => setFormFirstName(e.target.value)} />
+                    <TextField label="Last Name" fullWidth margin='normal' value={formLastName} onChange={(e) => setFormLastName(e.target.value)} />
+                    <TextField label="Email" type='email' fullWidth margin='normal' value={formEmail} onChange={(e) => setFormEmail(e.target.value)} />
+                    <TextField label="Phone Number" fullWidth margin='normal' value={formPhoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+                    <TextField label="Password" type={showPassword ? 'text' : 'password'} fullWidth margin='normal' value={formPassword} onChange={(e) => setFormPassword(e.target.value)}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position='end'>
+                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge='end' aria-label='toggle password visibility'>
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            )
 
-                    }}
-                />
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={handleCloseModal}>Cancelar</Button>
-                <Button variant='contained' onClick={handleSave}>{selectedUser ? 'Actualizar' : 'Guardar'}</Button>
-            </DialogActions>
-        </Dialog>
-    </Container>
-)
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseModal}>Cancelar</Button>
+                    <Button variant='contained' onClick={handleSave}>{selectedUser ? 'Actualizar' : 'Guardar'}</Button>
+                </DialogActions>
+            </Dialog>
+        </Container>
+    )
 }
