@@ -12,6 +12,8 @@ import { ProtectedRoute } from './routes/ProtectedRoute.tsx';
 import { UserList } from './components/users/UserList.tsx';
 import { DashBoard } from './components/dashboard/DashBoard.tsx';
 import { AdmissionExamList } from './components/admissionExams/AdmissionExamList.tsx';
+import { StatusExamenAdmin } from './components/admissionExams/StatusExamenAdmin';
+import { FinalizeCandidateProcess } from './components/admissionExams/FinalizeCandidateProcess';
 
 function App() {
   const { isAuthenticated, logout } = useAuth();
@@ -52,18 +54,30 @@ function App() {
         } />
         <Route path='/careers' element={
           <ProtectedRoute>
-            <CareersList />
+            <CareersList/>
           </ProtectedRoute>
         } />
-        <Route path='/examenes-admision' element={
-          <ProtectedRoute>
-            <AdmissionExamList/>
-          </ProtectedRoute>
+         <Route path='/examenes-admision' element={
+          <AdmissionExamList />
         }
         />
+        <Route path='/examenes-admision/:careerId' element={
+          <AdmissionExamList />
+        }
+        />
+        <Route path='/candiate/finalize-process/:noExpediente' element={
+          <ProtectedRoute>
+            <FinalizeCandidateProcess />
+          </ProtectedRoute>
+        } />
         <Route path='/users' element={
           <ProtectedRoute>
             <UserList />
+          </ProtectedRoute>
+        } />
+        <Route path='/status-examen-admision' element={
+          <ProtectedRoute>
+            <StatusExamenAdmin />
           </ProtectedRoute>
         } />
         <Route path='/' element={<Navigate to="/dashboard" />} />

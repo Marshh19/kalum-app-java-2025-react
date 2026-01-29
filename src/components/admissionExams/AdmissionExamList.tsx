@@ -1,13 +1,26 @@
 import { Box, Button, CircularProgress, Container, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography, type SelectChangeEvent } from '@mui/material'
 import { useEffect, useState } from 'react';
 import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd';
+import { useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
+
+type Params = {
+    careerId: string;
+};
 
 export const AdmissionExamList = () => {
+    const navigate = useNavigate();
+    const [apellidos, setApellidos] = useState('');
+    const [nombres, setNombres] = useState('');
+    const [direccion, setDireccion] = useState('');
+    const [telefono, setTelefono] = useState('');
+    const [email, setEmail] = useState('');
+    const { careerId } = useParams<Params>();
     const [admissionExams, setAdmissionExams] = useState<AdmissionExam[]>([]);
     const [careers, setCareers] = useState<Career[]>([]);
     const [academicDays, setAcademicDays] = useState<AcademicDay[]>([]);
     const [admissionExamSelected, setAdmissionExamSelected] = useState<AdmissionExam | null>(null);
-    const [careerSelected, setCareerExamSelected] = useState<Career | null>(null);
+    const [careerSelected, setCareerSelected] = useState<Career | null>(null);
     const [academicDaySelected, setAcademicDaySelected] = useState<AcademicDay | null>(null);
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -77,6 +90,10 @@ export const AdmissionExamList = () => {
             setCareers(dataCareers);
             setAcademicDays(dataAcademicDays);
             setLoading(false);
+            if(careerId) {
+                const career = dataCareers.find(c => c.carreraId === careerId);
+                setCareerSelected(career ?? null);
+            }
         }, 3000);
     }
 
@@ -101,7 +118,9 @@ export const AdmissionExamList = () => {
         )
     }
 
-    const handlerOpenModal = () => {
+    const handlerOpenModal = (examenId: string) => {
+        const exam = admissionExams.find(e => e.examenId === examenId)        
+        if(exam) setAdmissionExamSelected(exam ?? null);
         setModelOpen(true);
     }
 
@@ -118,13 +137,39 @@ export const AdmissionExamList = () => {
     const handlerChangeCareer = (event: SelectChangeEvent<string>) => {
         const id = event.target.value
         const selected = careers.find(x => x.carreraId === id) || null;
-        setCareerExamSelected(selected);
+        setCareerSelected(selected);
     }
 
     const handlerChangeAcademicDay = (event: SelectChangeEvent<string>) => {
         const id = event.target.value
         const selected = academicDays.find(x => x.jornadaId === id) || null;
         setAcademicDaySelected(selected);
+    }
+
+    const handlerEnrollar = () => {
+        handlerCloseModal();
+
+        const solicitud: SolicitudExamenAdmision = {
+            apellidos: apellidos,
+            nombres: nombres,
+            direccion: direccion,
+            telefono: telefono,
+            email: email,
+            examenId: admissionExamSelected?.examenId,
+            jornadaId: academicDaySelected?.jornadaId,
+            carreraId: careerSelected?.carreraId
+        }
+        // Llamar Api
+        Swal.fire({
+            title: 'Solicitud examen de admision',
+            text: 'Su solicitud fue enviada exitosamente, pronto recibira un correo con la información para finalizar el proceso',
+            icon: 'success',
+            footer: 'Kalum v1.0.0'
+        }).then(response => {
+            if(response.isConfirmed) {
+                navigate('/status-examen-admision');
+            }
+        });
     }
 
     return (
@@ -146,7 +191,7 @@ export const AdmissionExamList = () => {
                                     <TableCell>{admissionExam.examenId}</TableCell>
                                     <TableCell>{admissionExam.fechaExamen}</TableCell>
                                     <TableCell align='right'>
-                                        <IconButton color='primary' onClick={() => handlerOpenModal()}>
+                                        <IconButton color='primary' onClick={() => handlerOpenModal(admissionExam.examenId)}>
                                             <AssignmentAddIcon />
                                         </IconButton>
                                     </TableCell>
@@ -167,11 +212,11 @@ export const AdmissionExamList = () => {
             <Dialog open={modelOpen} fullWidth maxWidth="sm" onClose={() => handlerCloseModal()}>
                 <DialogTitle>Solicitud de examen de admisión</DialogTitle>
                 <DialogContent>
-                    <TextField label="Apellidos" fullWidth margin='normal' />
-                    <TextField label="Nombres" fullWidth margin='normal' />
-                    <TextField label="Direccion" fullWidth margin='normal' />
-                    <TextField label="Telefono" fullWidth margin='normal' />
-                    <TextField label="Email" fullWidth margin='normal' />
+                    <TextField label="Apellidos" fullWidth margin='normal' value={apellidos} onChange={(e) => setApellidos(e.target.value)} />
+                    <TextField label="Nombres" fullWidth margin='normal' value={nombres} onChange={(e) => setNombres(e.target.value)} />
+                    <TextField label="Direccion" fullWidth margin='normal' value={direccion} onChange={(e) => setDireccion(e.target.value)} />
+                    <TextField label="Telefono" fullWidth margin='normal' value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+                    <TextField label="Email" fullWidth margin='normal' value={email} onChange={(e) => setEmail(e.target.value)} />
                     <InputLabel>Examen admisión</InputLabel>
                     <Select label="Admission Exam" fullWidth value={admissionExamSelected?.examenId ?? ""} onChange={handlerChangeAdmissionExam}>
                         {
@@ -199,7 +244,7 @@ export const AdmissionExamList = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handlerCloseModal}>Cancelar</Button>
-                    <Button variant='contained'>Enrolar</Button>
+                    <Button onClick={handlerEnrollar} variant='contained'>Enrolar</Button>
                 </DialogActions>
             </Dialog>
         </Container>
@@ -220,4 +265,15 @@ interface AcademicDay {
     jornadaId: string;
     jornada: string;
     prefijo: string;
+}
+
+interface SolicitudExamenAdmision {
+    apellidos: string;
+    nombres: string;
+    direccion: string;
+    telefono: string;
+    email: string;
+    examenId: any;
+    carreraId: any;
+    jornadaId: any;
 }
