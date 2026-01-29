@@ -3,7 +3,8 @@ import React from 'react'
 import SchoolIcon from '@mui/icons-material/School'
 import PeopleIcon from '@mui/icons-material/People';
 import SecurityIcon from '@mui/icons-material/Security';
-import DashboardIcon from '@mui/icons-material/Dashboard'
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import { Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -46,6 +47,11 @@ export const SideNav: React.FC<SideNavProps> = ({ open, onClose }) => {
             text: 'Roles',
             icon: <SecurityIcon/>,
             path: '/usuarios'
+        },
+        {
+            text: 'Examenes Admision',
+            icon: <CalendarMonthIcon/>,
+            path: '/examenes-admision'
         }
     ]
 

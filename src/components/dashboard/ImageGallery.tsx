@@ -6,6 +6,8 @@ import electricidad from '../../assets/images/electricidad.jpg';
 import tics from '../../assets/images/tics.jpg';
 import logotipo from "../../assets/images/logotipo.png";
 import mecanica from '../../assets/images/mecanica.jpg';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 interface ImageCareerItem {
     id: string;
@@ -39,31 +41,53 @@ const itemData: ImageCareerItem[] = [
         title: 'Mecanica Automotriz',
         descripcion: 'Curso en el area de MECANICA AUTOMOTRIZ con estadares insdustriales a nivel global.'
     }
-]
+];
 
 export const ImageGallery: React.FC = () => {
+
+    const navigate = useNavigate();
+
+    const handlerAsignedCareer = () => {
+        const userString = localStorage.getItem('user');
+        if (userString) {
+            const user = JSON.parse(userString);
+            if (user.roles === 'ROLE_ACCOUNT') {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Asignacion de examen de admisión",
+                    text: "Vemos que es la primera vez que te asignaras un curso en la plataforma, es necesario que realices un examen de admisión previo, selecciona a continuacion una fecha de exámen",
+                    footer: '<a href="#">Kalum v1</a>'
+                }).then(response => {
+                    if (response.isConfirmed) {
+                        navigate("/examenes-admision");
+                    }
+                });
+            }
+        }
+    }
+
     return (
-        <Box sx={{width: "100%", textAlign:"center"}}>
-            <Box sx={{mt: 2, mb: 4}}>
-                <img src={logotipo} alt='Tecnologico Kalum' style={{width: "250px", maxWidth:"90%", marginBottom: "8px"}} />
-                <Typography variant='h4' sx={{fontWeight: "bold", mt:1}}>TECNOLOGICO KALUM</Typography>
+        <Box sx={{ width: "100%", textAlign: "center" }}>
+            <Box sx={{ mt: 2, mb: 4 }}>
+                <img src={logotipo} alt='Tecnologico Kalum' style={{ width: "250px", maxWidth: "90%", marginBottom: "8px" }} />
+                <Typography variant='h4' sx={{ fontWeight: "bold", mt: 1 }}>TECNOLOGICO KALUM</Typography>
             </Box>
             <Grid container spacing={3} columns={12} sx={{ padding: 3, display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
                 {itemData.map((item) => (
-                    <Grid key={item.id} size={{xs: 12, sm: 6, md: 4, lg: 3}} sx={{ display: "flex" }}>
+                    <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }} sx={{ display: "flex" }}>
                         <Card sx={{ borderRadius: 2, overflow: "hidden" }}>
-                            <CardMedia 
-                            component="img" 
-                            image={item.img}
-                            alt={item.title} 
-                            sx={{ 
-                                width: "100%", 
-                                height: 250,
-                                objectFit: "contain", 
-                                background: "rgba(158, 203, 222, 0.91)",
-                                padding: 1
-                            }} 
-                        />
+                            <CardMedia
+                                component="img"
+                                image={item.img}
+                                alt={item.title}
+                                sx={{
+                                    width: "100%",
+                                    height: 250,
+                                    objectFit: "contain",
+                                    background: "rgba(158, 203, 222, 0.91)",
+                                    padding: 1
+                                }}
+                            />
                             <CardContent>
                                 <Typography variant='h6' sx={{ fontWeight: "bold", mb: 0.5 }}>{item.title}</Typography>
                                 <Typography variant='body2' sx={{ color: "text.secondary" }}>
@@ -76,7 +100,7 @@ export const ImageGallery: React.FC = () => {
                                 </Typography>
                             </div>
                             <CardActions sx={{ justifyContent: "space-between" }}>
-                                <Button size='small'>ASIGNARME</Button>
+                                <Button size='small' onClick={() => handlerAsignedCareer()}>ASIGNARME</Button>
                                 <Button size='small'>COMPARTIR</Button>
                             </CardActions>
                         </Card>

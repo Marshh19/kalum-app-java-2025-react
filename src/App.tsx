@@ -11,6 +11,7 @@ import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './routes/ProtectedRoute.tsx';
 import { UserList } from './components/users/UserList.tsx';
 import { DashBoard } from './components/dashboard/DashBoard.tsx';
+import { AdmissionExamList } from './components/admissionExams/AdmissionExamList.tsx';
 
 function App() {
   const { isAuthenticated, logout } = useAuth();
@@ -54,6 +55,12 @@ function App() {
             <CareersList />
           </ProtectedRoute>
         } />
+        <Route path='/examenes-admision' element={
+          <ProtectedRoute>
+            <AdmissionExamList/>
+          </ProtectedRoute>
+        }
+        />
         <Route path='/users' element={
           <ProtectedRoute>
             <UserList />
